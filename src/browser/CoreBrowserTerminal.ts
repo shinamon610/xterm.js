@@ -375,13 +375,14 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
    * Apply key handling to the terminal
    */
   private _bindKeys(): void {
+    let shouldInput=true;
     this._register(addDisposableListener(this.textarea!, 'keyup', (ev: KeyboardEvent) => this._keyUp(ev), true));
     this._register(addDisposableListener(this.textarea!, 'keydown', (ev: KeyboardEvent) => this._keyDown(ev), true));
     this._register(addDisposableListener(this.textarea!, 'keypress', (ev: KeyboardEvent) => this._keyPress(ev), true));
     this._register(addDisposableListener(this.textarea!, 'compositionstart', () => this._compositionHelper!.compositionstart()));
     this._register(addDisposableListener(this.textarea!, 'compositionupdate', (e: CompositionEvent) => this._compositionHelper!.compositionupdate(e)));
-    this._register(addDisposableListener(this.textarea!, 'compositionend', () => this._compositionHelper!.compositionend()));
-    this._register(addDisposableListener(this.textarea!, 'input', (ev: InputEvent) => this._inputEvent(ev), true));
+    this._register(addDisposableListener(this.textarea!, 'compositionend', () => {this._compositionHelper!.compositionend();shouldInput=false}));
+    this._register(addDisposableListener(this.textarea!, 'input', (ev: InputEvent) => {if (shouldInput){this._inputEvent(ev)}else{shouldInput=true} }, true));
     this._register(this.onRender(() => this._compositionHelper!.updateCompositionElements()));
   }
 
